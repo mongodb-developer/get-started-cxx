@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 RUN export uid=1000 gid=1000 && \
-    mkdir -p /home/ubuntu && \
+    mkdir -p /home/ubuntu && mkdir /workspace && \
     echo "ubuntu:x:${uid}:${gid}:Developer,,,:/home/ubuntu:/bin/bash" >> /etc/passwd && \
     echo "ubuntu:x:${uid}:" >> /etc/group && \
     echo "ubuntu ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu && \
@@ -29,9 +29,11 @@ RUN export uid=1000 gid=1000 && \
     chown ${uid}:${gid} -R /home/ubuntu
 
 ENV HOME /home/ubuntu
+ENV WORKSPACE /workspace
 ENV CDRIVER_VERSION ${DRIVER_C_VERSION}
-ENV CPPDRIVER_VERSION ${DRIVER_VERSION}
 ENV LD_LIBRARY_PATH /usr/local/lib
+ENV DRIVER_VERSION ${DRIVER_VERSION}
+ENV MONGODB_URI ${MONGODB_URI}
 
 WORKDIR ${HOME}
 
@@ -46,10 +48,10 @@ RUN cd ${HOME}/mongo-c-driver-${CDRIVER_VERSION} && \
 
 RUN cd ${HOME}
 
-RUN wget https://github.com/mongodb/mongo-cxx-driver/archive/r${CPPDRIVER_VERSION}.tar.gz && \
-    tar -xzf r${CPPDRIVER_VERSION}.tar.gz
+RUN wget https://github.com/mongodb/mongo-cxx-driver/archive/r${DRIVER_VERSION}.tar.gz && \
+    tar -xzf r${DRIVER_VERSION}.tar.gz
 
-RUN cd ${HOME}/mongo-cxx-driver-r${CPPDRIVER_VERSION}/build && \
+RUN cd ${HOME}/mongo-cxx-driver-r${DRIVER_VERSION}/build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_VERSION=0.0.1 -DCMAKE_PREFIX_PATH=/usr/local .. && \
     make EP_mnmlstc_core && \
     make && make install 
@@ -61,6 +63,6 @@ RUN chown -R ubuntu ${HOME}/cxx && chmod -R 750 ${HOME}/cxx
 
 USER ubuntu
 
-WORKDIR ${HOME}/cxx
+WORKDIR ${WORKSPACE}/cxx
 
-CMD ["/bin/bash"]  
+ENTRYPOINT ["/bin/bash", "-c"]  
