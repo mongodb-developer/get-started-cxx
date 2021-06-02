@@ -43,3 +43,8 @@ Open the helper script `get-started.sh` in an editor of your choice, and change 
 ## About 
 
 This project is part of the MongoDB Get-Started code examples. Please see [get-started-readme](https://github.com/mongodb-developer/get-started-readme) for more information. 
+
+## Disclaimer
+
+This software is not supported by [MongoDB, Inc](https://www.mongodb.com)
+under any of their commercial support subscriptions or otherwise. Any usage is at your own risk.
