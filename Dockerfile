@@ -2,8 +2,8 @@ FROM alpine:3.13
 
 LABEL org.opencontainers.image.source=https://github.com/mongodb-developer/get-started-cxx
 
-ARG DRIVER_VERSION=3.6.2
-ARG DRIVER_C_VERSION=1.17.4
+ARG DRIVER_VERSION=3.6.5
+ARG DRIVER_C_VERSION=1.17.7
 
 RUN apk add --no-cache wget cmake make git tar gcc g++ musl-dev openssl-dev perl
 RUN addgroup -S gsgroup && adduser -S gsuser -G gsgroup

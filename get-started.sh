@@ -1,6 +1,6 @@
 #!/bin/bash
 MONGODB_URI=${1}
-DOCKER_IMAGE=ghcr.io/mongodb-developer/get-started-cxx
+DOCKER_IMAGE=ghcr.io/mongodb-developer/get-started-cxx:latest
 
 if [ -z ${MONGODB_URI} ]
 then
