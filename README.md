@@ -4,7 +4,7 @@ Repository to help getting started with MongoDB C++ driver connecting to MongoDB
 
 ## Information
 
-This Get-Started project uses [MongoDB C++ driver](https://docs.mongodb.com/drivers/cxx) version 3.6.5 by default. Although you can change the driver version, the provided code example was only tested against the default version of MongoDB driver. There is no guarantee that the code sample will work for all possible versions of the driver.
+This Get-Started project uses [MongoDB C++ driver](https://docs.mongodb.com/drivers/cxx) version 3.6.6 by default. Although you can change the driver version, the provided code example was only tested against the default version of MongoDB driver. There is no guarantee that the code sample will work for all possible versions of the driver.
 
 ## Pre-requisites 
 
@@ -29,7 +29,7 @@ Execute the helper shell script followed by the MongoDB URI that you would like 
 The Docker image has been built with a specific version. If you would like to use a different version, you could build a new image. Example: 
 
 ```
-docker build . -t start-cxx --build-arg DRIVER_VERSION=3.6.2 
+docker build . -t start-cxx --build-arg DRIVER_VERSION=3.6.5 
 ```
 
 This will build a docker image with a tag name `start-cxx`. 
