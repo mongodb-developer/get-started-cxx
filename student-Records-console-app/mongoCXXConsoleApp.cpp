@@ -12,7 +12,7 @@
 
 using namespace std;
 // Add URI inside the curly braces in below line.  
-static const mongocxx::uri s_Cluster0_uri = mongocxx::uri{ /*Add Uri here ---> */"" };
+static const mongocxx::uri s_Cluster0_uri = mongocxx::uri{ /*Add Uri here ---> */""};
 
 
 // ********************************************** Database Methods **********************************************
