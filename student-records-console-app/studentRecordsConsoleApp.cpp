@@ -187,13 +187,13 @@ void printStudentRecords(mongocxx::collection& collection)
 // ********************************************** Main **********************************************
 int main()
 {
-	if(mongoURI.to_string().empty())
-	{
-		cout << "URI is empty";
-		return 0;
-	}
+    if(mongoURI.to_string().empty())
+    {
+	cout << "URI is empty";
+	return 0;
+    }
 	
-	// Create an instance.
+    // Create an instance.
     mongocxx::instance inst{};
     
     mongocxx::options::client client_options;
