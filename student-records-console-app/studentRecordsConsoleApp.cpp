@@ -11,8 +11,28 @@
 #include <vector>
 
 using namespace std;
-// Add URI inside the curly braces in below line.  
-static const mongocxx::uri mongoURI = mongocxx::uri{ /*Add Uri here ---> */""};
+
+std::string getEnvironmentVariable(std::string environmentVarKey)
+{
+	char* pBuffer = nullptr;
+	size_t size = 0;
+	auto key = environmentVarKey.c_str();
+	
+	// Use the secure version of getenv, ie. _dupenv_s to fetch environment variable.  
+	if (_dupenv_s(&pBuffer, &size, key) == 0 && pBuffer != nullptr)
+	{
+		std::string environmentVarValue(pBuffer);
+		free(pBuffer);
+		return environmentVarValue;
+	}
+	else
+	{
+		return "";
+	}
+}
+
+auto mongoURIStr = getEnvironmentVariable("MONGODB_URI");
+static const mongocxx::uri mongoURI = mongocxx::uri{ mongoURIStr };
 
 
 // ********************************************** Database Methods **********************************************
@@ -80,20 +100,8 @@ void deleteDocument(mongocxx::collection& collection, const bsoncxx::document::v
 // Update the document with given key-value pair.
 void updateDocument(mongocxx::collection& collection, const string& key, const string& value, const string& newKey, const string& newValue)
 {
-
-	// Create the query filter
-	auto filter = bsoncxx::builder::stream::document{} << key << value << bsoncxx::builder::stream::finalize;
-
-	//Add query filter argument in find
-	auto cursor = collection.find({ filter });
-
-	for (auto&& doc : cursor)
-	{
-		if (doc[key].get_string().value == value)
-		{
-			collection.update_one(doc, bsoncxx::builder::stream::document{} << "$set" << bsoncxx::builder::stream::open_document << newKey << newValue << bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize);
-		}
-	}
+	collection.update_one(bsoncxx::builder::stream::document{} << key << value << bsoncxx::builder::stream::finalize,
+		bsoncxx::builder::stream::document{} << "$set" << bsoncxx::builder::stream::open_document << newKey << newValue << bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize);
 }
 
 // Find the document with given key-value pair.
@@ -107,10 +115,7 @@ void findDocument(mongocxx::collection& collection, const string& key, const str
 	
 	for (auto&& doc : cursor)
 	{
-		if (doc[key].get_string().value == value)
-		{
-			cout << bsoncxx::to_json(doc) << endl;
-		}
+		cout << bsoncxx::to_json(doc) << endl;
 	}
 }
 
