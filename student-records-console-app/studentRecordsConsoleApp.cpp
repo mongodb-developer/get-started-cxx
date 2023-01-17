@@ -12,7 +12,7 @@
 
 using namespace std;
 // Add URI inside the curly braces in below line.  
-static const mongocxx::uri s_Cluster0_uri = mongocxx::uri{ /*Add Uri here ---> */""};
+static const mongocxx::uri mongoURI = mongocxx::uri{ /*Add Uri here ---> */""};
 
 
 // ********************************************** Database Methods **********************************************
@@ -187,14 +187,12 @@ void printStudentRecords(mongocxx::collection& collection)
 // ********************************************** Main **********************************************
 int main()
 {
-    cout << "Hello World!" << endl;
-	
-	if (s_Cluster0_uri.to_string().empty())
+	if(mongoURI.to_string().empty())
 	{
 		cout << "URI is empty";
 		return 0;
 	}
-
+	
 	// Create an instance.
     mongocxx::instance inst{};
     
