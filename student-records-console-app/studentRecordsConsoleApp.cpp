@@ -200,52 +200,50 @@ int main()
     auto api = mongocxx::options::server_api{ mongocxx::options::server_api::version::k_version_1 };
     client_options.server_api_opts(api);
     mongocxx::client conn{ s_Cluster0_uri, client_options};
-
-	
-	
-	const string dbName = "StudentRecords";
-	const string collName = "StudentCollection";
-	
-	auto dbs = getDatabases(conn);
-	// Check if database already exists.
-	if (!(std::find(dbs.begin(), dbs.end(), dbName) != dbs.end()))
-	{
-		// Create a new database & collection for students.
-		conn[dbName];
-	}
-
-	auto studentDB = conn.database(dbName);
-	auto allCollections = studentDB.list_collection_names();
-	
-	// Check if collection already exists.
-	if (!(std::find(allCollections.begin(), allCollections.end(), collName) != allCollections.end()))
-	{
-		createCollection(studentDB, collName);
-	}
-	
-	auto studentCollection = studentDB.collection(collName);
-
-	// Create a menu to for user interaction
-	 int choice = -1;
-	
-	 do while (choice != 0)
-	 {
-		 //system("cls");
-		 cout << endl << "**************************************************************************************************************" << endl;
+    
+    const string dbName = "StudentRecords";
+    const string collName = "StudentCollection";
+    
+    auto dbs = getDatabases(conn);
+    // Check if database already exists.
+    if (!(std::find(dbs.begin(), dbs.end(), dbName) != dbs.end()))
+    {
+	// Create a new database & collection for students.
+	conn[dbName];
+     }
+     
+     auto studentDB = conn.database(dbName);
+     auto allCollections = studentDB.list_collection_names();
+     
+     // Check if collection already exists.
+     if (!(std::find(allCollections.begin(), allCollections.end(), collName) != allCollections.end()))
+     {
+	createCollection(studentDB, collName);
+     }
+     
+     auto studentCollection = studentDB.collection(collName);
+     
+     // Create a menu to for user interaction
+     int choice = -1;
+     
+     do while (choice != 0)
+     {
+	//system("cls");
+	cout << endl << "**************************************************************************************************************" << endl;
 		
-		 cout << "Enter 1 to input student record" << endl;
-		 cout << "Enter 2 to update student record" << endl;
-		 cout << "Enter 3 to find student record" << endl;
-		 cout << "Enter 4 to delete student record" << endl;
-		 cout << "Enter 5 to print all student records" << endl;
-		 cout << "Enter 0 to exit" << endl;
-		 cout << "Enter Choice : "; 
-		 cin >> choice;
+	cout << "Enter 1 to input student record" << endl;
+	cout << "Enter 2 to update student record" << endl;
+	cout << "Enter 3 to find student record" << endl;
+	cout << "Enter 4 to delete student record" << endl;
+	cout << "Enter 5 to print all student records" << endl;
+	cout << "Enter 0 to exit" << endl;
+	cout << "Enter Choice : "; 
+	cin >> choice;
 
-		 cout << endl;
+	cout << endl;
 		
-		 switch (choice)
-		 {
+	switch (choice)
+	{
 		 case 1:
 			 inputStudentRecord(studentCollection);
 			 break;
@@ -266,9 +264,9 @@ int main()
 		 default:
 			 cout << "Invalid choice" << endl;
 			 break;
-		 }
-
-	 } while (choice != 0);
-
-	 return 0;
+	}
+        
+      } while (choice != 0);
+      
+      return 0;
 }
