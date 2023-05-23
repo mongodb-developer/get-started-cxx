@@ -204,7 +204,7 @@ int main()
     mongocxx::options::client client_options;
     auto api = mongocxx::options::server_api{ mongocxx::options::server_api::version::k_version_1 };
     client_options.server_api_opts(api);
-    mongocxx::client conn{ s_Cluster0_uri, client_options};
+    mongocxx::client conn{ mongoURI, client_options};
     
     const string dbName = "StudentRecords";
     const string collName = "StudentCollection";
