@@ -1,19 +1,19 @@
-#include <mongocxx/client.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <mongocxx/uri.hpp>
+#include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <filesystem>
 
+// Define keys for the key-value pair.
 #define FILE_NAME "name"
 #define FILE_PATH "path"
 #define FILE_DATA "data"
-
 
 // ********************************************** Helper Functions **********************************************
 
