@@ -1,19 +1,19 @@
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/uri.hpp>
+#include <mongocxx/instance.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <filesystem>
 
-// Define keys for the key-value pair.
 #define FILE_NAME "name"
 #define FILE_PATH "path"
 #define FILE_DATA "data"
+
+using bsoncxx::builder::basic::kvp; 
+using bsoncxx::builder::basic::make_document;
 
 // ********************************************** Helper Functions **********************************************
 
@@ -44,30 +44,27 @@ bool upload(const std::string& filePath, mongocxx::collection& collection)
     bsoncxx::types::b_binary data{bsoncxx::binary_sub_type::k_binary, static_cast<std::uint32_t>(fileSize), reinterpret_cast<const std::uint8_t*>(buffer.data())};
 
     // Create a document with the file name and file content.
-    auto doc = bsoncxx::builder::stream::document{};
-    doc << FILE_NAME << std::filesystem::path(filePath).filename();
-    doc << FILE_PATH << filePath;
-    doc << FILE_DATA << data;
+
+    auto doc = make_document(
+	        kvp(FILE_NAME, std::filesystem::path(filePath).filename()),
+	        kvp(FILE_PATH, filePath),
+	        kvp(FILE_DATA, data));
 
     // Insert the document into the collection.
     collection.insert_one(doc.view());
-    file.close();
 
     std::cout << "Upload successful for: " << filePath << std::endl;
-
     return true;
 }
 
 // Download a file from a collection to a given folder.
-bool download(const std::string& fileName, const std::string& destiationFolder, mongocxx::collection& collection)
+bool download(const std::string& fileName, const std::string& destinationFolder, mongocxx::collection& collection)
 {
     // Create a query to find the file by filename
-    bsoncxx::builder::stream::document filter;
-    filter << FILE_NAME << fileName;
-    auto filterDoc = filter << bsoncxx::builder::stream::finalize;
+    auto filter = make_document(kvp(FILE_NAME, fileName));
 
      // Find the document in the collection
-    auto result = collection.find_one(filterDoc.view());
+    auto result = collection.find_one(filter.view());
 
     if (result) 
     {
@@ -76,18 +73,17 @@ bool download(const std::string& fileName, const std::string& destiationFolder, 
         auto binaryData = binaryDocView[FILE_DATA].get_binary();
         
         // Create a file to save the binary data
-        std::ofstream file(destiationFolder + fileName, std::ios::binary);
+        std::ofstream file(destinationFolder + fileName, std::ios::binary);
         if (!file) 
         {
-            std::cout << "Failed to create the file: " << fileName << " at " << destiationFolder << std::endl;
+            std::cout << "Failed to create the file: " << fileName << " at " << destinationFolder << std::endl;
             return false;
         }
         
         // Write the binary data to the file
         file.write(reinterpret_cast<const char*>(binaryData.bytes), binaryData.size);
-        file.close();
 
-        std::cout << "Download sucessful for: " << fileName << " at " << destiationFolder << std::endl;
+        std::cout << "Download successful for: " << fileName << " at " << destinationFolder << std::endl;
         return true;
     } 
     else 
@@ -95,7 +91,6 @@ bool download(const std::string& fileName, const std::string& destiationFolder, 
         std::cout << "File not found in the collection: " << fileName << std::endl;
         return false;
     }
-
 }
 
 
@@ -106,12 +101,6 @@ int main()
     {
         auto mongoURIStr = "<Insert MongoDB Connection String>";
         static const mongocxx::uri mongoURI = mongocxx::uri{ mongoURIStr };
-
-        if(mongoURI.to_string().empty())
-        {
-            std::cout << "URI is empty";
-            return 0;
-        }
         
         // Create an instance.
         mongocxx::instance inst{};
@@ -126,10 +115,12 @@ int main()
         
         auto fileStorageDB = conn.database(dbName);
         auto filesCollection = fileStorageDB.collection(collName);
+        // Drop previous data.
+        filesCollection.drop();
 
         // Upload all files in the upload folder.
         const std::string uploadFolder = "/Users/bishtr/repos/fileStorage/upload/";
-        for (const auto & filePath : std::filesystem::recursive_directory_iterator(uploadFolder))
+        for (const auto & filePath : std::filesystem::directory_iterator(uploadFolder))
         {
             if(std::filesystem::is_directory(filePath))
                 continue;
@@ -147,22 +138,27 @@ int main()
         const std::string fileName1 = "image-15.jpg", fileName2 = "Hi Seed Shaker 120bpm On Accents.wav";
         for ( auto fileName : {fileName1, fileName2} )
         {
-            download(fileName, downloadFolder, filesCollection);
+            if (!download(fileName, downloadFolder, filesCollection))
+            {
+                std::cout << "Download failed for: " << fileName << std::endl;
+            } 
         }
         
         // Download all files in the collection.
         auto cursor = filesCollection.find({});
         for (auto&& doc : cursor) 
         {
-            auto fileName = doc[FILE_NAME].get_string().value.to_string();
-            download(fileName, downloadFolder, filesCollection);
+            auto fileName = std::string(doc[FILE_NAME].get_string().value);
+            if (!download(fileName, downloadFolder, filesCollection))
+            {
+                std::cout << "Download failed for: " << fileName << std::endl;
+            } 
         }
     }
-    
     catch(const std::exception& e)
     {
-        std::cout << "Exception encountered: " e.what() << std::endl;
+        std::cout << "Exception encountered: " << e.what() << std::endl;
     }
-    
+
     return 0;
 }
