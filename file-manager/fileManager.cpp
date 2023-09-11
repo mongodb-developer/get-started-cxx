@@ -51,9 +51,16 @@ bool upload(const std::string& filePath, mongocxx::collection& collection)
 	        kvp(FILE_DATA, data));
 
     // Insert the document into the collection.
-    collection.insert_one(doc.view());
-
-    std::cout << "Upload successful for: " << filePath << std::endl;
+    auto result = collection.insert_one(doc.view());
+    
+    if(result)
+    {
+        std::cout << "Upload successful for: " << filePath << std::endl;
+    }
+    else
+    {
+        std::cout << "Upload failed for: " << filePath << std::endl;
+    }
     return true;
 }
 
